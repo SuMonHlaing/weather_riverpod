@@ -6,7 +6,7 @@ import 'package:riverpod_weather_app/features/search_city/provider/state/city_se
 import 'package:dio/dio.dart';
 
 class CitySearchProvider extends Notifier<CitySearchState> {
-  CitySearchState citySearchState = CitySearchLoading();
+  CitySearchState citySearchState = CitySearchForm();
   @override
   build() {
     return citySearchState;
@@ -15,13 +15,18 @@ class CitySearchProvider extends Notifier<CitySearchState> {
   late final Dio _dio = ref.read(DioProvider);
   late final CitySearchService _citySearchService = CitySearchService(_dio);
   void searchCity(String name) async {
-    citySearchState = CitySearchLoading();
+    state = CitySearchLoading();
     try {
       CitySearchResult citySearchResult = await _citySearchService.searchCity(
           name: name, count: 10, language: 'en', format: 'json');
-      citySearchState = CitySearchSuccess(citySearchResult);
+      state = CitySearchSuccess(citySearchResult);
     } catch (e) {
-      citySearchState = CitySearchFail(e.toString());
+      state = CitySearchFail(e.toString());
     }
   }
 }
+
+NotifierProvider<CitySearchProvider, CitySearchState> citySearchProvider =
+    NotifierProvider(() {
+  return CitySearchProvider();
+});
